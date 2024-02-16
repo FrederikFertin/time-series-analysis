@@ -33,12 +33,21 @@ y_hat <- x_ols %*% theta
 #plot(x, y_hat, col = "blue", title("Training data - OLS estimate"))
 print(theta)
 
+# Error, squared errors and residual variance estimate
 error <- train - y_hat
 RSS_ols <- t(error) %*% error
 sigma2 <- as.numeric(RSS_ols) / (n_train - length(theta))
 
-V_ols <- sigma2 * solve(t(x_ols) %*% x_ols)
+# Variance and std of estimated errors
+v_ols <- sigma2 * solve(t(x_ols) %*% x_ols)
 s_ols <- sqrt(V_ols)
+
+# Make forecast for next 12 months
+x_forecast <- seq(2022 + 11 / 12, 2023 + 10 / 12, by = 1 / 12)
+y_forecast <- x_forecast %*% theta
+
+# Confidence interval
+alpha <- 0.05
 
 
 
