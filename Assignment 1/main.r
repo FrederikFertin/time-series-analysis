@@ -54,8 +54,8 @@ y_forecast <- x_forecast %*% theta
 alpha <- 0.05
 vmatrix <- sigma2*(1+(x_forecast%*%solve(t(x_ols)%*%x_ols))%*%t(x_forecast))
 
-CI_lb <- y_forecast - qt(alpha / 2, n_train - length(theta)) * sqrt(diag(vmatrix))
-CI_ub <- y_forecast + qt(alpha / 2, n_train - length(theta)) * sqrt(diag(vmatrix))
+CI_lb <- y_forecast - qt(1 - alpha / 2, n_train - length(theta)) * sqrt(diag(vmatrix))
+CI_ub <- y_forecast + qt(1 - alpha / 2, n_train - length(theta)) * sqrt(diag(vmatrix))
 
 # Plot fitted model, training data, forecast and CI
 df_train <- data.frame(year = x, y = train, y_hat = y_hat)
@@ -68,13 +68,13 @@ ggplot(df_train, aes(x = year, y=train), title("Prediction of car fleet")) +
   geom_point(data = df_forecast, aes(x = year, y = y), col="orange", size=1.5) +
   geom_ribbon(data=df_forecast, aes(x=year,ymin=CI_lb, ymax=CI_ub), inherit.aes=FALSE, alpha=0.2, fill="blue") +
   ggtitle("Future prediction of car fleet with 95% prediction interval") + ylab("Number of Vehicles") +
-  theme(plot.title = element_text(hjust = 0.5))
+  theme(plot.title = element_text(hjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold"))
 
 # Risidual of model on historic data, clearly not white noise
-plot(x, error)
+plot(x, error, ylab = "Residuals")
 
 # Test error, model overestimates car fleet
-plot(x_forecast[,2], test - y_forecast)
+plot(x_forecast[,2], test - y_forecast, ylab = "Residuals", xlab = "x")
 
 
 
