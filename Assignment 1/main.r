@@ -20,9 +20,7 @@ test <- unlist(my_data[1, 2:n_test])
 ##### Q1 #####
 plot(x, train, col = "blue", title("Training data"), xlab="Year", ylab="Number of Vehicles")
 
-plot(2:n_test, test, col = "red")
-
-
+plot(2:n_test, test, col = "red", title("Test data"), xlab="Year", ylab="Number of Vehicles")
 
 
 
@@ -44,7 +42,7 @@ sigma2 <- as.numeric(RSS_ols) / (n_train - length(theta))
 
 # Variance and std of estimated errors
 v_ols <- sigma2 * solve(t(x_ols) %*% x_ols)
-s_ols <- sqrt(v_ols)
+s_ols <- sqrt(diag(v_ols))
 
 # Make forecast for next 12 months
 x_test <- seq(2022 + 11 / 12, 2023 + 10 / 12, by = 1 / 12)
@@ -63,11 +61,13 @@ df_train <- data.frame(year = x, y = train, y_hat = y_hat)
 df_forecast <- data.frame(year = x_forecast[,2], y = y_forecast, CI_lb = CI_lb, CI_ub = CI_ub)
 
 
-ggplot(df_train, aes(x = year, y=train)) +
+ggplot(df_train, aes(x = year, y=train), title("Prediction of car fleet")) +
   geom_point(col = "black") + 
   geom_line(aes(x = year, y=y_hat), col="red", size = 0.5) +
-  geom_point(data = df_forecast, aes(x = year, y = y), col="red", size=.5) +
-  geom_ribbon(data=df_forecast, aes(x=year,ymin=CI_lb, ymax=CI_ub), inherit.aes=FALSE, alpha=0.2, fill="blue")
+  geom_point(data = df_forecast, aes(x = year, y = y), col="orange", size=1.5) +
+  geom_ribbon(data=df_forecast, aes(x=year,ymin=CI_lb, ymax=CI_ub), inherit.aes=FALSE, alpha=0.2, fill="blue") +
+  ggtitle("Future prediction of car fleet with 95% prediction interval") + ylab("Number of Vehicles") +
+  theme(plot.title = element_text(hjust = 0.5))
 
 # Residual of model on historic data, clearly not white noise
 plot(x, error)
