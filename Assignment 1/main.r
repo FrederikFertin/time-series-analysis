@@ -24,21 +24,14 @@ plot(2:n_test, test, col = "red")
 
 
 ##### Q2 #####
-# Q2.1
 ones <- rep(1, length(x))
 x_ols <- cbind(ones, x)
 theta <- solve(t(x_ols) %*% x_ols) %*% t(x_ols) %*% train
 
 y_hat <- x_ols %*% theta
-#plot(x, y_hat, col = "blue", title("Training data - OLS estimate"))
-print(theta)
+plot(x, y_hat, col = "blue", title("Training data"))
 
-error <- train - y_hat
-RSS_ols <- t(error) %*% error
-sigma2 <- as.numeric(RSS_ols) / (n_train - length(theta))
 
-V_ols <- sigma2 * solve(t(x_ols) %*% x_ols)
-s_ols <- sqrt(V_ols)
 
 ##### Q3 #####
 
