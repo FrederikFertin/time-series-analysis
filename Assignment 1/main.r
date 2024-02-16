@@ -56,24 +56,18 @@ CI_lb <- y_forecast - qt(alpha / 2, n_train - length(theta)) * sqrt(diag(vmatrix
 CI_ub <- y_forecast + qt(alpha / 2, n_train - length(theta)) * sqrt(diag(vmatrix))
 
 # Plot fitted model, training data, forecast and CI
-plot(x, train, col = "blue", title("Training data - OLS estimate"),
-     xlim=c(2018, 2024), ylim = c(2.3E6, 2.8E6)) 
-lines(x, y_hat, col = "red")
-points(x_forecast[, 2], y_forecast, col = "green")
-lines(x_forecast[, 2], CI_lb, col = "green")
-lines(x_forecast[, 2], CI_ub, col = "green")
-
-
 df_train <- data.frame(year = x, y = train, y_hat = y_hat)
 df_forecast <- data.frame(year = x_forecast[,2], y = y_forecast, CI_lb = CI_lb, CI_ub = CI_ub)
 
 
-# Ribbon missing.....
 ggplot(df_train, aes(x = year, y=train)) +
-  geom_point() + 
+  geom_point(col = "black") + 
   geom_line(aes(x = year, y=y_hat), col="red", size = 0.5) +
   geom_point(data = df_forecast, aes(x = year, y = y), col="red", size=.5) +
-  geom_ribbon(data = df_forecast, aes(x=year, ymin=CI_lb, ymax=CI_ub), inherit.aes=FALSE, alpha=0.8, fill="red")
+  geom_ribbon(data=df_forecast, aes(x=year,ymin=CI_lb, ymax=CI_ub), inherit.aes=FALSE, alpha=0.2, fill="blue")
+
+# Risidual of model, they are not white noise
+plot(x, error)
 
 ##### Q3 #####
 
