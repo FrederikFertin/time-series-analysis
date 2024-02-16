@@ -66,8 +66,11 @@ ggplot(df_train, aes(x = year, y=train)) +
   geom_point(data = df_forecast, aes(x = year, y = y), col="red", size=.5) +
   geom_ribbon(data=df_forecast, aes(x=year,ymin=CI_lb, ymax=CI_ub), inherit.aes=FALSE, alpha=0.2, fill="blue")
 
-# Risidual of model, they are not white noise
+# Risidual of model on historic data, clearly not white noise
 plot(x, error)
+
+# Test error, model overestimates car fleet
+plot(x_forecast[,2], test - y_forecast)
 
 ##### Q3 #####
 
