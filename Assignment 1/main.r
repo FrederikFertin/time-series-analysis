@@ -160,13 +160,13 @@ h_N <-  (lambda^0) * f(0) * y_train[i]
 # 4.3
 # Using λ = 0.9 update FN and hN recursively and provide F10 and h10. We will 
 # not calculate predictions for these first 10 steps.
-lambda = 0.9
+lambda <- 0.9
 for (i in 2:10){
   F_N <- F_N + lambda^(i-1) * f(-(i-1)) %*% t(f(-(i-1)))  
   h_N <- lambda * Linv %*% h_N + f(0)*y_train[i]
-  theta_N <- solve(F_N)%*%h_N
+  theta_N <- solve(F_N) %*% h_N
   
-  yhat_N <- t(f(-(i-1):(59-i)))%*%theta_N
+  yhat_N <- t(f(-(i-1):(59-i))) %*% theta_N
   plot_N <- ggplot(df_train, aes(x=year, y=y)) +
     geom_point() + 
     geom_point(data=df_train[1:i,], col="blue") + 
@@ -183,13 +183,13 @@ for (i in 2:10){
 # step. You should calculate predictions for 1 month ahead, 6 months ahead and 12 months ahead.
 for (i in 11:59){
   F_N <- F_N + lambda^(i-1) * f(-(i-1)) %*% t(f(-(i-1)))  
-  h_N <- lambda * Linv %*% h_N + f(0)*y[i]
-  theta_N <- solve(F_N)%*%h_N
+  h_N <- lambda * Linv %*% h_N + f(0) * y[i] # y not found
+  theta_N <- solve(F_N) %*% h_N
   
-  yhat_N <- t(f(-(i-1):(59-i)))%*%theta_N
-  ypred_1 <- t(f(1:2))%*%theta_N
-  ypred_6 <- t(f(1:6))%*%theta_N
-  ypred_12 <- t(f(1:12))%*%theta_N
+  yhat_N <- t(f(-(i-1):(59-i))) %*% theta_N
+  ypred_1 <- t(f(1:2)) %*% theta_N
+  ypred_6 <- t(f(1:6)) %*% theta_N
+  ypred_12 <- t(f(1:12)) %*% theta_N
   
   plot_N <- ggplot(df_train, aes(x=year, y=y)) +
     geom_point() + 
