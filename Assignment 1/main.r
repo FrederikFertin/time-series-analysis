@@ -178,6 +178,7 @@ for (i in 2:10){
     geom_line(data=df_train[1:i,], aes(y=yhat_N[1:i]), col="blue") +
     #geom_line(aes(y=yhat_ols), col="red", linetype=2) + 
     #xlim(1980, 2005) + ylim(0,5.5) + 
+    labs(y= "Number of Vehicles", x = "Year")
     ggtitle(paste0("N = ", i))
   
   print(plot_N)
