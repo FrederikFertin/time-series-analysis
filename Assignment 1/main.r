@@ -95,7 +95,8 @@ W_WLS <- solve(SIGMA_WLS)
 # 3.2
 weights <- lambda^((n-1):0)
 # plot the weights:
-barplot(weights, names= round(x), col = "blue",xlab = "Year",ylab="Weight")
+p <- barplot(weights, names = x, col = "blue", xlab = "Year", ylab = "Weight", axes = FALSE)
+axis(side = 2, pos = -0.2)
 
 # 3.3
 print(sum(weights))
@@ -122,6 +123,7 @@ for (j in 1:length(lambdas)) {
   y_pred <- x_forecast %*% WLS
   df_forecast_wls[frame_names[j]] <- y_pred
   df_train[frame_names[j]] <- x_ols %*% WLS
+  print(WLS)
 }
 
 colors <- c("magenta", "blue", "red", "green")
@@ -132,14 +134,14 @@ ggplot(df_train, aes(x = year, y=train, colour='black')) +
   geom_point(data=df_forecast_wls, aes(x=year, y=l08, colour="n8"), size=1)+
   geom_point(data=df_forecast_wls, aes(x=year, y=l07, colour="n7"), size=1)+
   geom_point(data=df_forecast_wls, aes(x=year, y=l06, colour="n6"), size=1)+
-  geom_line(data=df_train, aes(x=year, y=l09, colour="n9"),linewidth=1, alpha=0.5)+
-  geom_line(data=df_train, aes(x=year, y=l08, colour="n8"),linewidth=1, alpha=0.5)+
-  geom_line(data=df_train, aes(x=year, y=l07, colour="n7"),linewidth=1, alpha=0.5)+
-  geom_line(data=df_train, aes(x=year, y=l06, colour="n6"),linewidth=1, alpha=0.5)+
-  theme(legend.position = c(0.8, 0.2), plot.title = element_text(hjust = 0.5)) +
+  geom_line(data=df_train, aes(x=year, y=l09, colour="n9"),linewidth=1, alpha=0.3)+
+  geom_line(data=df_train, aes(x=year, y=l08, colour="n8"),linewidth=1, alpha=0.3)+
+  geom_line(data=df_train, aes(x=year, y=l07, colour="n7"),linewidth=1, alpha=0.3)+
+  geom_line(data=df_train, aes(x=year, y=l06, colour="n6"),linewidth=1, alpha=0.3)+
+  theme(legend.position = c(0.9, 0.2), plot.title = element_text(hjust = 0.5)) +
   scale_color_manual(values = c(n9 = colors[1], n8 = colors[2], n7 = colors[3], n6 = colors[4]),
                      labels = c(n9 = "\u03bb = 0.9", n8 = "\u03bb = 0.8", n7 = "\u03bb = 0.7", n6 = "\u03bb = 0.6")) +
-  labs(y= "Number of Vehicles", x = "Year", title = "Forecasting 12 months with WLS")
+  labs(y= "Number of Vehicles", x = "Year", title = "Forecasting 12 months with WLS", color = "Legend")
   
 # 3.6
 
@@ -154,6 +156,9 @@ Linv <- solve(L)
 
 # 4.2
 i <- 1
+F_1 <- x_ols[1:i,1:2] %*% t(x_ols[1:i,1:2])
+h_1 <- t(x_ols[1:i,1:2]) * y_train[1:i]
+
 F_N <-  (lambda^0) * f(0)%*%t(f(0))
 h_N <-  (lambda^0) * f(0) * y_train[i]
 
