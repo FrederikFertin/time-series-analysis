@@ -60,19 +60,24 @@ CI_ub <- y_forecast + qt(1 - alpha / 2, n_train - length(theta)) * sqrt(diag(vma
 
 # Plot fitted model, training data, forecast and CI
 df_train <- data.frame(year = x, y = train, y_hat = y_hat)
-df_forecast <- data.frame(year = x_forecast[,2], y = y_forecast, CI_lb = CI_lb, CI_ub = CI_ub)
+df_forecast <- data.frame(year = x_forecast[,2], y = test, yhat = y_forecast, CI_lb = CI_lb, CI_ub = CI_ub)
 
 
 ggplot(df_train, aes(x = year, y=train), title("Prediction of car fleet")) +
   geom_point(col = "black") + 
   geom_line(aes(x = year, y=y_hat), col="red", size = 0.5) +
+  geom_point(data = df_forecast, aes(x = year, y = yhat), col="red", size=1.5) +
   geom_point(data = df_forecast, aes(x = year, y = y), col="orange", size=1.5) +
-  geom_ribbon(data=df_forecast, aes(x=year,ymin=CI_lb, ymax=CI_ub), inherit.aes=FALSE, alpha=0.2, fill="blue") +
+  geom_ribbon(data=df_forecast, aes(x=year, ymin=CI_lb, ymax=CI_ub), inherit.aes=FALSE, alpha=0.2, fill="blue") +
   ggtitle("Future prediction of car fleet with 95% prediction interval") + ylab("Number of Vehicles") +
   theme(plot.title = element_text(hjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold"))
 
 # Residual of model on historic data, clearly not white noise
 plot(x, error, ylab = "Residuals")
+
+# QQ plot of residuals
+qqnorm(error, ylab = "Error quantiles")
+qqline(error)
 
 # Test error, model overestimates car fleet
 plot(x_forecast[, 2], test - y_forecast, ylab = "Residuals", xlab = "x")
