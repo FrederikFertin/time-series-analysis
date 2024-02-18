@@ -7,9 +7,9 @@ library("ggplot2")
 my_data <- read_excel("Assignment 1/DST_BIL54_train.xlsx")
 n_train <- length(my_data)
 train <- unlist(my_data[1, 2:n_train])
-x <- seq(2018, 2022 + 10/12, by = 1 / 12)
-n = length(x)
-y_train = train
+x <- seq(2018, 2022 + 10 / 12, by = 1 / 12)
+n <- length(x)
+y_train <- train
 
 # Test Data
 my_data <- read_excel("Assignment 1/DST_BIL54_test.xlsx")
@@ -51,7 +51,7 @@ y_forecast <- x_forecast %*% theta
 
 # Confidence interval
 alpha <- 0.05
-vmatrix <- sigma2*(1+(x_forecast%*%solve(t(x_ols)%*%x_ols))%*%t(x_forecast))
+vmatrix <- sigma2 * (1 + (x_forecast %*% solve(t(x_ols) %*% x_ols)) %*% t(x_forecast))
 
 CI_lb <- y_forecast - qt(1 - alpha / 2, n_train - length(theta)) * sqrt(diag(vmatrix))
 CI_ub <- y_forecast + qt(1 - alpha / 2, n_train - length(theta)) * sqrt(diag(vmatrix))
@@ -73,7 +73,7 @@ ggplot(df_train, aes(x = year, y=train), title("Prediction of car fleet")) +
 plot(x, error, ylab = "Residuals")
 
 # Test error, model overestimates car fleet
-plot(x_forecast[,2], test - y_forecast, ylab = "Residuals", xlab = "x")
+plot(x_forecast[, 2], test - y_forecast, ylab = "Residuals", xlab = "x")
 
 
 
@@ -81,7 +81,7 @@ plot(x_forecast[,2], test - y_forecast, ylab = "Residuals", xlab = "x")
 ##### Q3 #####
 
 # 3.1
-lambda = 0.9
+lambda <- 0.9
 SIGMA_OLS <- diag(n)
 SIGMA_WLS <- diag(n)
 for (i in 1:n) {
