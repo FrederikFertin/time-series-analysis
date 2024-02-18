@@ -5,6 +5,7 @@ library("ggplot2")
 ### DATA IMPORT ###
 # Training Data
 my_data <- read_excel("Assignment 1/DST_BIL54_train.xlsx")
+# my_data <- read_excel("/Users/thomastrosborg/Desktop/Uni/Master/1. semester/Time Series Analysis/git/Assignment 1/DST_BIL54_train.xlsx")
 n_train <- length(my_data)
 train <- unlist(my_data[1, 2:n_train])
 x <- seq(2018, 2022 + 10/12, by = 1 / 12)
@@ -13,6 +14,7 @@ y_train = train
 
 # Test Data
 my_data <- read_excel("Assignment 1/DST_BIL54_test.xlsx")
+# my_data <- read_excel("/Users/thomastrosborg/Desktop/Uni/Master/1. semester/Time Series Analysis/git/Assignment 1/DST_BIL54_test.xlsx")
 n_test <- length(my_data)
 test <- unlist(my_data[1, 2:n_test])
 
@@ -69,7 +71,7 @@ ggplot(df_train, aes(x = year, y=train), title("Prediction of car fleet")) +
   ggtitle("Future prediction of car fleet with 95% prediction interval") + ylab("Number of Vehicles") +
   theme(plot.title = element_text(hjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold"))
 
-# Risidual of model on historic data, clearly not white noise
+# Residual of model on historic data, clearly not white noise
 plot(x, error, ylab = "Residuals")
 
 # Test error, model overestimates car fleet
@@ -143,3 +145,65 @@ ggplot(df_train, aes(x = year, y=train, colour='black')) +
 
 
 ##### Q4 #####
+
+# 4.1 
+f <- function(j) rbind(1, j)
+L <- matrix(c(1.,0., 1.,1.),
+            byrow=TRUE, nrow=2)
+Linv <- solve(L) 
+
+# 4.2
+i <- 1
+F_N <-  (lambda^0) * f(0)%*%t(f(0))
+h_N <-  (lambda^0) * f(0) * y_train[i]
+
+# 4.3
+# Using λ = 0.9 update FN and hN recursively and provide F10 and h10. We will 
+# not calculate predictions for these first 10 steps.
+lambda = 0.9
+for (i in 2:10){
+  F_N <- F_N + lambda^(i-1) * f(-(i-1)) %*% t(f(-(i-1)))  
+  h_N <- lambda * Linv %*% h_N + f(0)*y_train[i]
+  theta_N <- solve(F_N)%*%h_N
+  
+  yhat_N <- t(f(-(i-1):(59-i)))%*%theta_N
+  plot_N <- ggplot(df_train, aes(x=year, y=y)) +
+    geom_point() + 
+    geom_point(data=df_train[1:i,], col="blue") + 
+    geom_line(data=df_train[1:i,], aes(y=yhat_N[1:i]), col="blue") +
+    #geom_line(aes(y=yhat_ols), col="red", linetype=2) + 
+    #xlim(1980, 2005) + ylim(0,5.5) + 
+    ggtitle(paste0("N = ", i))
+  
+  print(plot_N)
+}
+
+# 4.4
+# Now update the model recursively up to F59 and h59, while also calculating predictions at each
+# step. You should calculate predictions for 1 month ahead, 6 months ahead and 12 months ahead.
+for (i in 11:59){
+  F_N <- F_N + lambda^(i-1) * f(-(i-1)) %*% t(f(-(i-1)))  
+  h_N <- lambda * Linv %*% h_N + f(0)*y[i]
+  theta_N <- solve(F_N)%*%h_N
+  
+  yhat_N <- t(f(-(i-1):(59-i)))%*%theta_N
+  ypred_1 <- t(f(1:2))%*%theta_N
+  ypred_6 <- t(f(1:6))%*%theta_N
+  ypred_12 <- t(f(1:12))%*%theta_N
+  
+  plot_N <- ggplot(df_train, aes(x=year, y=y)) +
+    geom_point() + 
+    geom_point(data=df_train[1:i,], col="blue") + 
+    geom_line(data=df_train[1:i,], aes(y=yhat_N[1:i]), col="blue") +
+    
+    #geom_line(aes(y=yhat_ols), col="red", linetype=2) + 
+    #xlim(1980, 2005) + ylim(0,5.5) + 
+    ggtitle(paste0("N = ", i))
+  
+  print(plot_N)
+  
+}
+
+
+
+
