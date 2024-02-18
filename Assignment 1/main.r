@@ -168,11 +168,11 @@ h_N <-  (lambda^0) * f(0) * y_train[i]
 lambda <- 0.9
 for (i in 2:10){
   F_N <- F_N + lambda^(i-1) * f(-(i-1)) %*% t(f(-(i-1)))  
-  h_N <- lambda * Linv %*% h_N + f(0)*y_train[i]
+  h_N <- lambda * Linv %*% h_N + f(0) * y_train[i]
   theta_N <- solve(F_N) %*% h_N
   
   yhat_N <- t(f(-(i-1):(59-i))) %*% theta_N
-  plot_N <- ggplot(df_train, aes(x=year, y=y)) +
+  plot_N <- ggplot(df_train, aes(x = year, y = y)) +
     geom_point() + 
     geom_point(data=df_train[1:i,], col="blue") + 
     geom_line(data=df_train[1:i,], aes(y=yhat_N[1:i]), col="blue") +
