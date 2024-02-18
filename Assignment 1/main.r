@@ -60,19 +60,24 @@ CI_ub <- y_forecast + qt(1 - alpha / 2, n_train - length(theta)) * sqrt(diag(vma
 
 # Plot fitted model, training data, forecast and CI
 df_train <- data.frame(year = x, y = train, y_hat = y_hat)
-df_forecast <- data.frame(year = x_forecast[,2], y = y_forecast, CI_lb = CI_lb, CI_ub = CI_ub)
+df_forecast <- data.frame(year = x_forecast[,2], y = test, yhat = y_forecast, CI_lb = CI_lb, CI_ub = CI_ub)
 
 
 ggplot(df_train, aes(x = year, y=train), title("Prediction of car fleet")) +
   geom_point(col = "black") + 
   geom_line(aes(x = year, y=y_hat), col="red", size = 0.5) +
+  geom_point(data = df_forecast, aes(x = year, y = yhat), col="red", size=1.5) +
   geom_point(data = df_forecast, aes(x = year, y = y), col="orange", size=1.5) +
-  geom_ribbon(data=df_forecast, aes(x=year,ymin=CI_lb, ymax=CI_ub), inherit.aes=FALSE, alpha=0.2, fill="blue") +
+  geom_ribbon(data=df_forecast, aes(x=year, ymin=CI_lb, ymax=CI_ub), inherit.aes=FALSE, alpha=0.2, fill="blue") +
   ggtitle("Future prediction of car fleet with 95% prediction interval") + ylab("Number of Vehicles") +
   theme(plot.title = element_text(hjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold"))
 
 # Residual of model on historic data, clearly not white noise
 plot(x, error, ylab = "Residuals")
+
+# QQ plot of residuals
+qqnorm(error, ylab = "Error quantiles")
+qqline(error)
 
 # Test error, model overestimates car fleet
 plot(x_forecast[, 2], test - y_forecast, ylab = "Residuals", xlab = "x")
@@ -168,17 +173,17 @@ h_N <-  (lambda^0) * f(0) * y_train[i]
 lambda <- 0.9
 for (i in 2:10){
   F_N <- F_N + lambda^(i-1) * f(-(i-1)) %*% t(f(-(i-1)))  
-  h_N <- lambda * Linv %*% h_N + f(0)*y_train[i]
+  h_N <- lambda * Linv %*% h_N + f(0) * y_train[i]
   theta_N <- solve(F_N) %*% h_N
   
   yhat_N <- t(f(-(i-1):(59-i))) %*% theta_N
-  plot_N <- ggplot(df_train, aes(x=year, y=y)) +
+  plot_N <- ggplot(df_train, aes(x = year, y = y)) +
     geom_point() + 
     geom_point(data=df_train[1:i,], col="blue") + 
     geom_line(data=df_train[1:i,], aes(y=yhat_N[1:i]), col="blue") +
     #geom_line(aes(y=yhat_ols), col="red", linetype=2) + 
     #xlim(1980, 2005) + ylim(0,5.5) + 
-    ggtitle(paste0("N = ", i))
+    labs(y= "Number of Vehicles", x = "Year", title = paste0("N = ", i))
   
   print(plot_N)
 }
