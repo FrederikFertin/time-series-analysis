@@ -100,7 +100,7 @@ W_WLS <- solve(SIGMA_WLS)
 # 3.2
 weights <- lambda^((n-1):0)
 # plot the weights:
-barplot(weights, names=1:n)
+barplot(weights, names= round(x), col = "blue",xlab = "Year",ylab="Weight")
 
 # 3.3
 print(sum(weights))
