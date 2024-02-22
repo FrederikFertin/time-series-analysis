@@ -4,8 +4,8 @@ library("ggplot2")
 
 ### DATA IMPORT ###
 # Training Data
-my_data <- read_excel("Assignment 1/DST_BIL54_train.xlsx")
-# my_data <- read_excel("/Users/thomastrosborg/Desktop/Uni/Master/1. semester/Time Series Analysis/git/Assignment 1/DST_BIL54_train.xlsx")
+# my_data <- read_excel("Assignment 1/DST_BIL54_train.xlsx")
+my_data <- read_excel("/Users/thomastrosborg/Desktop/Uni/Master/1. semester/Time Series Analysis/git/Assignment 1/DST_BIL54_train.xlsx")
 n_train <- length(my_data)
 train <- unlist(my_data[1, 2:n_train])
 x <- seq(2018, 2022 + 10 / 12, by = 1 / 12)
@@ -13,8 +13,8 @@ n <- length(x)
 y_train <- train
 
 # Test Data
-my_data <- read_excel("Assignment 1/DST_BIL54_test.xlsx")
-# my_data <- read_excel("/Users/thomastrosborg/Desktop/Uni/Master/1. semester/Time Series Analysis/git/Assignment 1/DST_BIL54_test.xlsx")
+# my_data <- read_excel("Assignment 1/DST_BIL54_test.xlsx")
+my_data <- read_excel("/Users/thomastrosborg/Desktop/Uni/Master/1. semester/Time Series Analysis/git/Assignment 1/DST_BIL54_test.xlsx")
 n_test <- length(my_data)
 test <- unlist(my_data[1, 2:n_test])
 
@@ -161,9 +161,6 @@ Linv <- solve(L)
 
 # 4.2
 i <- 1
-F_1 <- x_ols[1:i,1:2] %*% t(x_ols[1:i,1:2])
-h_1 <- t(x_ols[1:i,1:2]) * y_train[1:i]
-
 F_N <-  (lambda^0) * f(0)%*%t(f(0))
 h_N <-  (lambda^0) * f(0) * y_train[i]
 
@@ -191,28 +188,126 @@ for (i in 2:10){
 # 4.4
 # Now update the model recursively up to F59 and h59, while also calculating predictions at each
 # step. You should calculate predictions for 1 month ahead, 6 months ahead and 12 months ahead.
+# 4.5
+#Plot the resulting 1-month, 6-month and 12-month prediction together with the training data.
+
+idx_pred_1 <- seq(from = (10+1), to = 59, by = 1)
+idx_pred_6 <- seq(from = (10+6), to = 59, by = 1)
+idx_pred_12 <- seq(from = (10+12), to = 59, by = 1)
+
+df_forecast_1m <- data.frame(year = x_ols[,2][idx_pred_1])
+df_forecast_6m <- data.frame(year = x_ols[,2][idx_pred_6])
+df_forecast_12m <- data.frame(year = x_ols[,2][idx_pred_12])
+df_forecast_1m['values'] <- NA
+df_forecast_6m['values'] <- NA
+df_forecast_12m['values'] <- NA
+
 for (i in 11:59){
-  F_N <- F_N + lambda^(i-1) * f(-(i-1)) %*% t(f(-(i-1)))  
-  h_N <- lambda * Linv %*% h_N + f(0) * y[i] # y not found
+  F_N <- F_N + lambda^(i-1) * f(-(i-1)) %*% t(f(-(i-1)))
+  h_N <- lambda * Linv %*% h_N + f(0) * y_train[i] # y not found
   theta_N <- solve(F_N) %*% h_N
   
   yhat_N <- t(f(-(i-1):(59-i))) %*% theta_N
-  ypred_1 <- t(f(1:2)) %*% theta_N
-  ypred_6 <- t(f(1:6)) %*% theta_N
-  ypred_12 <- t(f(1:12)) %*% theta_N
-  
-  plot_N <- ggplot(df_train, aes(x=year, y=y)) +
-    geom_point() + 
-    geom_point(data=df_train[1:i,], col="blue") + 
-    geom_line(data=df_train[1:i,], aes(y=yhat_N[1:i]), col="blue") +
-    
-    #geom_line(aes(y=yhat_ols), col="red", linetype=2) + 
-    #xlim(1980, 2005) + ylim(0,5.5) + 
-    ggtitle(paste0("N = ", i))
-  
-  print(plot_N)
-  
+  df_forecast_1m[(i-10),'values'] <- yhat_N[(i+1)]
+  df_forecast_6m[(i-10),'values'] <- yhat_N[(i+6)]
+  df_forecast_12m[(i-10),'values'] <- yhat_N[(i+12)]
+  #df_forecast_1m[(i-10),'values'] <- t(f(1)) %*% theta_N
+  #df_forecast_6m[(i-10),'values'] <- t(f(6)) %*% theta_N
+  #df_forecast_12m[(i-10),'values'] <- t(f(12)) %*% theta_N
 }
+
+ggplot(df_train, aes(x = year, y=train, colour='black')) +
+  geom_point(col = "black") +
+  geom_point(data=df_forecast_1m, aes(x=year, y=values, colour='n1'), size=1)+
+  geom_point(data=df_forecast_6m, aes(x=year, y=values, colour='n2'), size=1)+
+  geom_point(data=df_forecast_12m, aes(x=year, y=values, colour='n3'), size=1)+
+  scale_color_manual(values = c(n1 = colors[1], n2 = colors[3], n3 = colors[4]),
+    labels = c(n1 = "1 month", n2 = "6 months", n3 = "12 months")) +
+    labs(y= "Number of Vehicles", x = "Year", title = "Forecasts with different forecast horizons", color = "Legend")
+
+
+# 4.6 Repeat the iterative predictions for λ = 0.55, 0.56, 0.57, ..., 0.95, and 
+# calculate the root-meansquare of the prediction errors for each forecast-horizon 
+# (1 month, 6 months and 12 months) and for each value of λ.
+# Plot the root-mean-square of the prediction errors versus λ for both 1 month, 6 months and 12
+# months predictions.
+# 4.7-9
+df_forecast_1m <- data.frame(year = x_ols[,2][idx_pred_1])
+df_forecast_6m <- data.frame(year = x_ols[,2][idx_pred_6])
+df_forecast_12m <- data.frame(year = x_ols[,2][idx_pred_12])
+df_forecast_1m['values'] <- NA
+df_forecast_6m['values'] <- NA
+df_forecast_12m['values'] <- NA
+
+lambdas <- seq(from = 0.55, to = 0.95, by = 0.01)
+df_prediction_errors <- data.frame(lambda = lambdas)
+frame_names <- c('m1', 'm6', 'm12')
+df_prediction_errors[frame_names] <- NA
+
+for (j in 1:length(lambdas)) {
+  lambda <- lambdas[j]
+  i <- 1
+  F_N <-  (lambda^0) * f(0)%*%t(f(0))
+  h_N <-  (lambda^0) * f(0) * y_train[i]
+  
+  for (i in 2:59){
+    F_N <- F_N + lambda^(i-1) * f(-(i-1)) %*% t(f(-(i-1)))
+    h_N <- lambda * Linv %*% h_N + f(0) * y_train[i] 
+    if (i > 10) {
+      theta_N <- solve(F_N) %*% h_N
+      
+      yhat_N <- t(f(-(i-1):(59-i))) %*% theta_N
+      df_forecast_1m[(i-10),'values'] <- yhat_N[(i+1)]
+      df_forecast_6m[(i-10),'values'] <- yhat_N[(i+6)]
+      df_forecast_12m[(i-10),'values'] <- yhat_N[(i+12)]
+    }
+  }
+  df_prediction_errors[j,'m1'] <- sqrt(mean((y_train[(11+1):59] - df_forecast_1m[(1:(59-11-1)),'values'])^2))
+  df_prediction_errors[j,'m6'] <- sqrt(mean((y_train[(11+6):59] - df_forecast_6m[(1:(59-11-6)),'values'])^2))
+  df_prediction_errors[j,'m12'] <- sqrt(mean((y_train[(11+12):59] - df_forecast_12m[(1:(59-11-12)),'values'])^2))
+}
+
+ggplot(df_prediction_errors, aes(x = lambda, y=m1, colour='n1')) +
+  geom_point() +
+  geom_point(data=df_prediction_errors, aes(x=lambda, y=m1, colour='n1'), size=1)+
+  geom_point(data=df_prediction_errors, aes(x=lambda, y=m6, colour='n2'), size=1)+
+  geom_point(data=df_prediction_errors, aes(x=lambda, y=m12, colour='n3'), size=1)+
+  scale_color_manual(values = c(n1 = colors[1], n2 = colors[3], n3 = colors[4]),
+                     labels = c(n1 = "1 month", n2 = "6 months", n3 = "12 months")) +
+  labs(y= "RMSE", x = "lambda", title = "RMSE for different values of lambda", color = "Legend")
+
+
+
+# 4.10. 
+# It would be problematic to make λ as small as 0.5. Why is that? 
+# (hint: compare the sum of weights to the number of parameters).
+lambda <- 0.5
+weights <- lambda^((n-1):0)
+print(sum(weights))
+# = 2
+
+# 4.11. 
+#Compare the 1-month-ahead prediction with λ = 0.55 to the naive persistence model 
+# (i.e. using only the last observation to predict 1 month ahead). 
+# Which one is better?
+
+rmse_naive <- sqrt(mean((y_train[(11+1):59] - y_train[(11):58])^2))
+# = 5330.434
+
+# 4.12
+# Now choose the best forecasts at time t = 59 of Yt for time t = 60, t = 65 and t = 71, i.e.
+# ˆ Y59+1|59, ˆ Y59+6|59, and ˆ Y59+12|59 and plot them together with the training data AND the test
+# data (i.e. 2nd data file).
+opt_lambda_1m <- 
+opt_lambda_6m <- 
+opt_lambda_12m <- 
+
+
+
+
+
+
+
 
 
 
