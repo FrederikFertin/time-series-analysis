@@ -4,8 +4,8 @@ library("ggplot2")
 
 ### DATA IMPORT ###
 # Training Data
-# my_data <- read_excel("Assignment 1/DST_BIL54_train.xlsx")
-my_data <- read_excel("/Users/thomastrosborg/Desktop/Uni/Master/1. semester/Time Series Analysis/git/Assignment 1/DST_BIL54_train.xlsx")
+ my_data <- read_excel("Assignment 1/DST_BIL54_train.xlsx")
+#my_data <- read_excel("/Users/thomastrosborg/Desktop/Uni/Master/1. semester/Time Series Analysis/git/Assignment 1/DST_BIL54_train.xlsx")
 n_train <- length(my_data)
 train <- unlist(my_data[1, 2:n_train])
 x <- seq(2018, 2022 + 10 / 12, by = 1 / 12)
@@ -13,8 +13,8 @@ n <- length(x)
 y_train <- train
 
 # Test Data
-# my_data <- read_excel("Assignment 1/DST_BIL54_test.xlsx")
-my_data <- read_excel("/Users/thomastrosborg/Desktop/Uni/Master/1. semester/Time Series Analysis/git/Assignment 1/DST_BIL54_test.xlsx")
+ my_data <- read_excel("Assignment 1/DST_BIL54_test.xlsx")
+#my_data <- read_excel("/Users/thomastrosborg/Desktop/Uni/Master/1. semester/Time Series Analysis/git/Assignment 1/DST_BIL54_test.xlsx")
 n_test <- length(my_data)
 test <- unlist(my_data[1, 2:n_test])
 
@@ -165,7 +165,7 @@ F_N <-  (lambda^0) * f(0)%*%t(f(0))
 h_N <-  (lambda^0) * f(0) * y_train[i]
 
 # 4.3
-# Using λ = 0.9 update FN and hN recursively and provide F10 and h10. We will 
+# Using lambda = 0.9 update FN and hN recursively and provide F10 and h10. We will 
 # not calculate predictions for these first 10 steps.
 lambda <- 0.9
 for (i in 2:10){
@@ -191,9 +191,9 @@ for (i in 2:10){
 # 4.5
 #Plot the resulting 1-month, 6-month and 12-month prediction together with the training data.
 
-idx_pred_1 <- seq(from = (10+1), to = 59, by = 1)
-idx_pred_6 <- seq(from = (10+6), to = 59, by = 1)
-idx_pred_12 <- seq(from = (10+12), to = 59, by = 1)
+idx_pred_1 <- seq(from = (11+1), to = 59, by = 1)
+idx_pred_6 <- seq(from = (11+6), to = 59, by = 1)
+idx_pred_12 <- seq(from = (11+12), to = 59, by = 1)
 
 df_forecast_1m <- data.frame(year = x_ols[,2][idx_pred_1])
 df_forecast_6m <- data.frame(year = x_ols[,2][idx_pred_6])
@@ -226,10 +226,10 @@ ggplot(df_train, aes(x = year, y=train, colour='black')) +
     labs(y= "Number of Vehicles", x = "Year", title = "Forecasts with different forecast horizons", color = "Legend")
 
 
-# 4.6 Repeat the iterative predictions for λ = 0.55, 0.56, 0.57, ..., 0.95, and 
+# 4.6 Repeat the iterative predictions for lambda = 0.55, 0.56, 0.57, ..., 0.95, and 
 # calculate the root-meansquare of the prediction errors for each forecast-horizon 
-# (1 month, 6 months and 12 months) and for each value of λ.
-# Plot the root-mean-square of the prediction errors versus λ for both 1 month, 6 months and 12
+# (1 month, 6 months and 12 months) and for each value of lambda.
+# Plot the root-mean-square of the prediction errors versus lambda for both 1 month, 6 months and 12
 # months predictions.
 # 4.7-9
 df_forecast_1m <- data.frame(year = x_ols[,2][idx_pred_1])
@@ -262,9 +262,9 @@ for (j in 1:length(lambdas)) {
       df_forecast_12m[(i-10),'values'] <- yhat_N[(i+12)]
     }
   }
-  df_prediction_errors[j,'m1'] <- sqrt(mean((y_train[(11+1):59] - df_forecast_1m[(1:(59-11-1)),'values'])^2))
-  df_prediction_errors[j,'m6'] <- sqrt(mean((y_train[(11+6):59] - df_forecast_6m[(1:(59-11-6)),'values'])^2))
-  df_prediction_errors[j,'m12'] <- sqrt(mean((y_train[(11+12):59] - df_forecast_12m[(1:(59-11-12)),'values'])^2))
+  df_prediction_errors[j,'m1'] <- sqrt(mean((y_train[(11+1):59] - df_forecast_1m[(1:(59-10-1)),'values'])^2))
+  df_prediction_errors[j,'m6'] <- sqrt(mean((y_train[(11+6):59] - df_forecast_6m[(1:(59-10-6)),'values'])^2))
+  df_prediction_errors[j,'m12'] <- sqrt(mean((y_train[(11+12):59] - df_forecast_12m[(1:(59-10-12)),'values'])^2))
 }
 
 ggplot(df_prediction_errors, aes(x = lambda, y=m1, colour='n1')) +
@@ -279,7 +279,7 @@ ggplot(df_prediction_errors, aes(x = lambda, y=m1, colour='n1')) +
 
 
 # 4.10. 
-# It would be problematic to make λ as small as 0.5. Why is that? 
+# It would be problematic to make lambda as small as 0.5. Why is that? 
 # (hint: compare the sum of weights to the number of parameters).
 lambda <- 0.5
 weights <- lambda^((n-1):0)
@@ -287,7 +287,7 @@ print(sum(weights))
 # = 2
 
 # 4.11. 
-#Compare the 1-month-ahead prediction with λ = 0.55 to the naive persistence model 
+#Compare the 1-month-ahead prediction with lambda = 0.55 to the naive persistence model 
 # (i.e. using only the last observation to predict 1 month ahead). 
 # Which one is better?
 
@@ -298,9 +298,9 @@ rmse_naive <- sqrt(mean((y_train[(11+1):59] - y_train[(11):58])^2))
 # Now choose the best forecasts at time t = 59 of Yt for time t = 60, t = 65 and t = 71, i.e.
 # ˆ Y59+1|59, ˆ Y59+6|59, and ˆ Y59+12|59 and plot them together with the training data AND the test
 # data (i.e. 2nd data file).
-opt_lambda_1m <- 
-opt_lambda_6m <- 
-opt_lambda_12m <- 
+opt_lambda_1m <- 2
+opt_lambda_6m <- 2
+opt_lambda_12m <- 2
 
 
 
