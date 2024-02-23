@@ -4,8 +4,8 @@ library("ggplot2")
 
 ### DATA IMPORT ###
 # Training Data
-# my_data <- read_excel("Assignment 1/DST_BIL54_train.xlsx")
-my_data <- read_excel("/Users/thomastrosborg/Desktop/Uni/Master/1. semester/Time Series Analysis/git/Assignment 1/DST_BIL54_train.xlsx")
+my_data <- read_excel("Assignment 1/DST_BIL54_train.xlsx")
+# my_data <- read_excel("/Users/thomastrosborg/Desktop/Uni/Master/1. semester/Time Series Analysis/git/Assignment 1/DST_BIL54_train.xlsx")
 n_train <- length(my_data)
 train <- unlist(my_data[1, 2:n_train])
 x <- seq(2018, 2022 + 10 / 12, by = 1 / 12)
@@ -13,8 +13,8 @@ n <- length(x)
 y_train <- train
 
 # Test Data
-# my_data <- read_excel("Assignment 1/DST_BIL54_test.xlsx")
-my_data <- read_excel("/Users/thomastrosborg/Desktop/Uni/Master/1. semester/Time Series Analysis/git/Assignment 1/DST_BIL54_test.xlsx")
+ my_data <- read_excel("Assignment 1/DST_BIL54_test.xlsx")
+#my_data <- read_excel("/Users/thomastrosborg/Desktop/Uni/Master/1. semester/Time Series Analysis/git/Assignment 1/DST_BIL54_test.xlsx")
 n_test <- length(my_data)
 test <- unlist(my_data[1, 2:n_test])
 
@@ -165,7 +165,7 @@ F_N <-  (lambda^0) * f(0)%*%t(f(0))
 h_N <-  (lambda^0) * f(0) * y_train[i]
 
 # 4.3
-# Using λ = 0.9 update FN and hN recursively and provide F10 and h10. We will 
+# Using lambda = 0.9 update FN and hN recursively and provide F10 and h10. We will
 # not calculate predictions for these first 10 steps.
 lambda <- 0.9
 for (i in 2:10){
@@ -228,10 +228,10 @@ ggplot(df_train, aes(x = year, y=train, colour='black')) +
     labs(y= "Number of Vehicles", x = "Year", title = "Forecasts with different forecast horizons", color = "Legend")
 
 
-# 4.6 Repeat the iterative predictions for λ = 0.55, 0.56, 0.57, ..., 0.95, and 
+# 4.6 Repeat the iterative predictions for lambda = 0.55, 0.56, 0.57, ..., 0.95, and
 # calculate the root-meansquare of the prediction errors for each forecast-horizon 
-# (1 month, 6 months and 12 months) and for each value of λ.
-# Plot the root-mean-square of the prediction errors versus λ for both 1 month, 6 months and 12
+# (1 month, 6 months and 12 months) and for each value of lambda.
+# Plot the root-mean-square of the prediction errors versus lambda for both 1 month, 6 months and 12
 # months predictions.
 df_forecast_1m <- data.frame(year = x_ols[,2][idx_pred_1])
 df_forecast_6m <- data.frame(year = x_ols[,2][idx_pred_6])
@@ -294,7 +294,7 @@ opt_lambda_12m <- lambdas[idx_min_12m]
 opt_lambdas <- c(opt_lambda_1m, opt_lambda_6m, opt_lambda_12m)
 
 # 4.10. 
-# It would be problematic to make λ as small as 0.5. Why is that? 
+# It would be problematic to make lambda as small as 0.5. Why is that?
 # (hint: compare the sum of weights to the number of parameters).
 lambda <- 0.5
 weights <- lambda^((n-1):0)
@@ -302,7 +302,7 @@ print(sum(weights))
 # = 2
 
 # 4.11. 
-#Compare the 1-month-ahead prediction with λ = 0.55 to the naive persistence model 
+#Compare the 1-month-ahead prediction with lambda = 0.55 to the naive persistence model
 # (i.e. using only the last observation to predict 1 month ahead). 
 # Which one is better?
 
@@ -313,10 +313,10 @@ h_N <-  (lambda^0) * f(0) * y_train[i]
 
 for (i in 2:59){
   F_N <- F_N + lambda^(i-1) * f(-(i-1)) %*% t(f(-(i-1)))
-  h_N <- lambda * Linv %*% h_N + f(0) * y_train[i] 
+  h_N <- lambda * Linv %*% h_N + f(0) * y_train[i]
   if (i > 10) {
     theta_N <- solve(F_N) %*% h_N
-    
+
     yhat_N <- t(f(-(i-1):(59-i))) %*% theta_N
     df_forecast_1m[(i-10),'values'] <- yhat_N[(i+1)]
   }
@@ -349,10 +349,10 @@ for (k in 1:3) {
   i <- 1
   F_N <-  (lambda^0) * f(0)%*%t(f(0))
   h_N <-  (lambda^0) * f(0) * y_train[i]
-  
+
   for (i in 2:59){
     F_N <- F_N + lambda^(i-1) * f(-(i-1)) %*% t(f(-(i-1)))
-    h_N <- lambda * Linv %*% h_N + f(0) * y_train[i] 
+    h_N <- lambda * Linv %*% h_N + f(0) * y_train[i]
   }
   theta_N <- solve(F_N) %*% h_N
   y_pred <- t(f(l[k])) %*% theta_N
@@ -366,7 +366,7 @@ ggplot(df_train, aes(x=year, y=y)) +
   geom_point(data=df_test, aes(x=year, y=y, colour='n1'), size=0.5)+
   geom_point(data=df_pred, aes(x=year, y=values, colour='n2'), size=0.5)+
   theme(plot.title = element_text(hjust = 0.5))+
-  xlim(2018, 2024) + ylim(2350000,2700000) + 
+  xlim(2018, 2024) + ylim(2350000,2700000) +
   scale_color_manual(values = c(n1 = 'black', n2 = "magenta"),
                      labels = c(n1 = "Test data", n2 = "Forecast")) +
   labs(y= "Number of Vehicles", x = "Year", title = "Forecasts compared to test data", color = "Legend")
