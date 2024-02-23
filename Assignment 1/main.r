@@ -191,9 +191,9 @@ for (i in 2:10){
 # 4.5
 #Plot the resulting 1-month, 6-month and 12-month prediction together with the training data.
 
-idx_pred_1 <- seq(from = (10+1), to = 59, by = 1)
-idx_pred_6 <- seq(from = (10+6), to = 59, by = 1)
-idx_pred_12 <- seq(from = (10+12), to = 59, by = 1)
+idx_pred_1 <- seq(from = (11+1), to = 59, by = 1)
+idx_pred_6 <- seq(from = (11+6), to = 59, by = 1)
+idx_pred_12 <- seq(from = (11+12), to = 59, by = 1)
 
 df_forecast_1m <- data.frame(year = x_ols[,2][idx_pred_1])
 df_forecast_6m <- data.frame(year = x_ols[,2][idx_pred_6])
@@ -215,13 +215,15 @@ for (i in 11:59){
   #df_forecast_6m[(i-10),'values'] <- t(f(6)) %*% theta_N
   #df_forecast_12m[(i-10),'values'] <- t(f(12)) %*% theta_N
 }
-
+colors <- c("blue", "red", "darkgreen")
 ggplot(df_train, aes(x = year, y=train, colour='black')) +
-  geom_point(col = "black") +
-  geom_point(data=df_forecast_1m, aes(x=year, y=values, colour='n1'), size=1)+
-  geom_point(data=df_forecast_6m, aes(x=year, y=values, colour='n2'), size=1)+
-  geom_point(data=df_forecast_12m, aes(x=year, y=values, colour='n3'), size=1)+
-  scale_color_manual(values = c(n1 = colors[1], n2 = colors[3], n3 = colors[4]),
+  geom_line(col = "black") +
+  geom_point(data=df_forecast_1m, aes(x=year, y=values, colour='n1'), size=0.7)+
+  geom_point(data=df_forecast_6m, aes(x=year, y=values, colour='n2'), size=0.7)+
+  geom_point(data=df_forecast_12m, aes(x=year, y=values, colour='n3'), size=0.7)+
+  theme(plot.title = element_text(hjust = 0.5))+
+  xlim(2018, 2023) + ylim(2350000,270000) +
+  scale_color_manual(values = c(n1 = colors[1], n2 = colors[2], n3 = colors[3]),
     labels = c(n1 = "1 month", n2 = "6 months", n3 = "12 months")) +
     labs(y= "Number of Vehicles", x = "Year", title = "Forecasts with different forecast horizons", color = "Legend")
 
@@ -231,7 +233,6 @@ ggplot(df_train, aes(x = year, y=train, colour='black')) +
 # (1 month, 6 months and 12 months) and for each value of λ.
 # Plot the root-mean-square of the prediction errors versus λ for both 1 month, 6 months and 12
 # months predictions.
-# 4.7-9
 df_forecast_1m <- data.frame(year = x_ols[,2][idx_pred_1])
 df_forecast_6m <- data.frame(year = x_ols[,2][idx_pred_6])
 df_forecast_12m <- data.frame(year = x_ols[,2][idx_pred_12])
@@ -262,21 +263,35 @@ for (j in 1:length(lambdas)) {
       df_forecast_12m[(i-10),'values'] <- yhat_N[(i+12)]
     }
   }
-  df_prediction_errors[j,'m1'] <- sqrt(mean((y_train[(11+1):59] - df_forecast_1m[(1:(59-11-1)),'values'])^2))
-  df_prediction_errors[j,'m6'] <- sqrt(mean((y_train[(11+6):59] - df_forecast_6m[(1:(59-11-6)),'values'])^2))
-  df_prediction_errors[j,'m12'] <- sqrt(mean((y_train[(11+12):59] - df_forecast_12m[(1:(59-11-12)),'values'])^2))
+  df_prediction_errors[j,'m1'] <- sqrt(mean((y_train[(11+1):59] - df_forecast_1m[(1:(59-10-1)),'values'])^2))
+  df_prediction_errors[j,'m6'] <- sqrt(mean((y_train[(11+6):59] - df_forecast_6m[(1:(59-10-6)),'values'])^2))
+  df_prediction_errors[j,'m12'] <- sqrt(mean((y_train[(11+12):59] - df_forecast_12m[(1:(59-10-12)),'values'])^2))
 }
 
-ggplot(df_prediction_errors, aes(x = lambda, y=m1, colour='n1')) +
-  geom_point() +
+ggplot()+ #df_prediction_errors, aes(x = lambda, y=m1, colour='n1'), size=1) +
+  #geom_point() +
   geom_point(data=df_prediction_errors, aes(x=lambda, y=m1, colour='n1'), size=1)+
   geom_point(data=df_prediction_errors, aes(x=lambda, y=m6, colour='n2'), size=1)+
   geom_point(data=df_prediction_errors, aes(x=lambda, y=m12, colour='n3'), size=1)+
-  scale_color_manual(values = c(n1 = colors[1], n2 = colors[3], n3 = colors[4]),
+  theme(plot.title = element_text(hjust = 0.5))+
+  xlim(0.55, 0.95) + ylim(0,30000) +
+  scale_color_manual(values = c(n1 = colors[1], n2 = colors[2], n3 = colors[3]),
                      labels = c(n1 = "1 month", n2 = "6 months", n3 = "12 months")) +
   labs(y= "RMSE", x = "lambda", title = "RMSE for different values of lambda", color = "Legend")
 
+# 4.7
+idx_min_1m <- which.min(df_prediction_errors[,'m1'])
+opt_lambda_1m <- lambdas[idx_min_1m]
 
+# 4.8
+idx_min_6m <- which.min(df_prediction_errors[,'m6'])
+opt_lambda_6m <- lambdas[idx_min_6m]
+
+# 4.9
+idx_min_12m <- which.min(df_prediction_errors[,'m12'])
+opt_lambda_12m <- lambdas[idx_min_12m]
+
+opt_lambdas <- c(opt_lambda_1m, opt_lambda_6m, opt_lambda_12m)
 
 # 4.10. 
 # It would be problematic to make λ as small as 0.5. Why is that? 
@@ -291,6 +306,34 @@ print(sum(weights))
 # (i.e. using only the last observation to predict 1 month ahead). 
 # Which one is better?
 
+lambda <- 0.55
+i <- 1
+F_N <-  (lambda^0) * f(0)%*%t(f(0))
+h_N <-  (lambda^0) * f(0) * y_train[i]
+
+for (i in 2:59){
+  F_N <- F_N + lambda^(i-1) * f(-(i-1)) %*% t(f(-(i-1)))
+  h_N <- lambda * Linv %*% h_N + f(0) * y_train[i] 
+  if (i > 10) {
+    theta_N <- solve(F_N) %*% h_N
+    
+    yhat_N <- t(f(-(i-1):(59-i))) %*% theta_N
+    df_forecast_1m[(i-10),'values'] <- yhat_N[(i+1)]
+  }
+}
+
+df_persistence <- data.frame(year=df_train[12:59,'year'], values=df_train[11:58,'y'])
+
+ggplot(df_train, aes(x=year, y=y)) +
+  geom_line(colour='black') +
+  geom_point(data=df_forecast_1m, aes(x=year, y=values, colour='n1'), size=0.7)+
+  geom_point(data=df_persistence, aes(x=year, y=values, colour='n2'), size=0.7)+
+  theme(plot.title = element_text(hjust = 0.5))+
+  xlim(2018, 2023) + ylim(2350000,2650000) +
+  scale_color_manual(values = c(n1 = colors[1], n2 = "magenta"),
+                     labels = c(n1 = "1 month", n2 = "persistence")) +
+  labs(y= "Number of Vehicles", x = "Year", title = "Comparison with persistence model", color = "Legend")
+
 rmse_naive <- sqrt(mean((y_train[(11+1):59] - y_train[(11):58])^2))
 # = 5330.434
 
@@ -298,12 +341,35 @@ rmse_naive <- sqrt(mean((y_train[(11+1):59] - y_train[(11):58])^2))
 # Now choose the best forecasts at time t = 59 of Yt for time t = 60, t = 65 and t = 71, i.e.
 # ˆ Y59+1|59, ˆ Y59+6|59, and ˆ Y59+12|59 and plot them together with the training data AND the test
 # data (i.e. 2nd data file).
-opt_lambda_1m <- 
-opt_lambda_6m <- 
-opt_lambda_12m <- 
+df_pred <- data.frame(year = x_test[c(1,6,12)])
+df_pred['values'] <- NA
+l <- c(1,6,12)
+for (k in 1:3) {
+  lambda <- opt_lambdas[k]
+  i <- 1
+  F_N <-  (lambda^0) * f(0)%*%t(f(0))
+  h_N <-  (lambda^0) * f(0) * y_train[i]
+  
+  for (i in 2:59){
+    F_N <- F_N + lambda^(i-1) * f(-(i-1)) %*% t(f(-(i-1)))
+    h_N <- lambda * Linv %*% h_N + f(0) * y_train[i] 
+  }
+  theta_N <- solve(F_N) %*% h_N
+  y_pred <- t(f(l[k])) %*% theta_N
+  df_pred[k,'values'] <- y_pred
+}
 
+df_test <- data.frame(year = x_test, y = test)
 
-
+ggplot(df_train, aes(x=year, y=y)) +
+  geom_line(colour='black') +
+  geom_point(data=df_test, aes(x=year, y=y, colour='n1'), size=0.5)+
+  geom_point(data=df_pred, aes(x=year, y=values, colour='n2'), size=0.5)+
+  theme(plot.title = element_text(hjust = 0.5))+
+  xlim(2018, 2024) + ylim(2350000,2700000) + 
+  scale_color_manual(values = c(n1 = 'black', n2 = "magenta"),
+                     labels = c(n1 = "Test data", n2 = "Forecast")) +
+  labs(y= "Number of Vehicles", x = "Year", title = "Forecasts compared to test data", color = "Legend")
 
 
 
