@@ -73,10 +73,10 @@ ggplot(df_train, aes(x = year, y=train), title("Prediction of car fleet")) +
   theme(plot.title = element_text(hjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold"))
 
 # Residual of model on historic data, clearly not white noise
-plot(x, error, ylab = "Residuals")
+plot(x, error, pch=19, ylab = "Residuals")
 
 # QQ plot of residuals
-qqnorm(error, ylab = "Error quantiles")
+qqnorm(error, pch=19,ylab = "Error quantiles")
 qqline(error)
 
 # Test error, model overestimates car fleet
