@@ -37,34 +37,35 @@ plotting <- function(x) {
 }
 
 set.seed(1)
+l <- 200
 
 ## Task 3.1
 model <- list(ar=c(0.6))
-x <- arima.sim(model, 100, n.start=100)
+x <- arima.sim(model, l, n.start=100)
 plotting(x)
 
 ## Task 3.2
 model <- list(ar=c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.9))
-x <- arima.sim(model, 100, n.start=100)
+x <- arima.sim(model, l, n.start=100)
 plotting(x)
 
 ## Task 3.3
 model <- list(ar=c(0.9), ma=c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.7))
-x <- arima.sim(model, 100, n.start=100)
+x <- arima.sim(model, l, n.start=100)
 plotting(x)
 
 ## Task 3.4
 model <- list(ar=c(-0.6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.8))
 # x <- arima.sim(model, 100, n.start=100)
-x <- sim(model, 100, nburnin=100)
+x <- sim(model, l, nburnin=100)
 plotting(x)
 
 ## Task 3.5
 model <- list(ma=c(0.4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -0.8))
-x <- arima.sim(model, 100, n.start=100)
+x <- arima.sim(model, l, n.start=100)
 plotting(x)
 
 ## Task 3.6
 model <- list(ar=c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.7), ma=c(-0.4))
-x <- arima.sim(model, 100, n.start=100)
+x <- arima.sim(model, l, n.start=100)
 plotting(x)
