@@ -70,9 +70,7 @@ sapply(epsHat, mean)
 sapply(epsHat, var)
 sapply(epsHat, sd)
 
-# Check IID. First QQ
-#qqnorm(epsHat$k1, ylab = "Error quantiles")
-#qqline(epsHat$k1)
+# Check IID. Plot histogram and pointplot
 hist(epsHat$k1, main ="", xlab = "Residuals")
 
 # Plot epsHat as a pointplot versus the index
@@ -154,3 +152,18 @@ ggplot() +
     ylab("Power") +
     ggtitle("Solar Power") +
     theme(plot.title = element_text(hjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold"))
+
+
+# Plot historical data, model and CI, without transformation
+plotdata1 <- data.frame(t = t, solar = X)
+plotdata2 <- data.frame(t = seq(2011, 2011+(k-1)/12, 1/12), modelEst = modelEst)
+plotdata3 <- data.frame(t = seq(2011, 2011+(k-1)/12, 1/12), CI1 = CI[,1], CI2 = CI[,2])
+ggplot() +
+    geom_line(data = plotdata1, aes(x = t, y = solar), color = "black") +
+    geom_line(data = plotdata2, aes(x = t, y = modelEst), color = "red") +
+    geom_ribbon(data = plotdata3, aes(x = t, ymin = CI1, ymax = CI2), fill = "blue", alpha = 0.2) +
+    xlab("Time") +
+    ylab("Power") +
+    ggtitle("Solar Power") +
+    theme(plot.title = element_text(hjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold"))
+
