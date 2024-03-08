@@ -55,6 +55,7 @@ epsilon <- rnorm(N, mean = 0, sd = sigmaeps)
 # Define AR model and run on historical data
 xHat <- -phi1 * lagdf(X, 1) - Phi1 * lagdf(X, 12) - phi1 * Phi1 * lagdf(X, 13) + epsilon
 
+
 # Plot 
 plot.ts(t, xHat$k1, col = "red", ylab = "log(power)-mu", xlab = "Year", xy.labels = FALSE, xy.lines = TRUE, xaxt = "n") # xaxt = "n" to suppress the x-axis
 lines(t, X, col = "black")
@@ -144,20 +145,6 @@ CI <- cbind(modelEst - z * sqrt(vars), modelEst + z * sqrt(vars))
 plotdata1 <- data.frame(t = t, solar = solar)
 plotdata2 <- data.frame(t = seq(2011, 2011+(k-1)/12, 1/12), modelEst = exp(modelEst + mu))
 plotdata3 <- data.frame(t = seq(2011, 2011+(k-1)/12, 1/12), CI1 = exp(CI[,1] + mu), CI2 = exp(CI[,2] + mu))
-ggplot() +
-    geom_line(data = plotdata1, aes(x = t, y = solar), color = "black") +
-    geom_line(data = plotdata2, aes(x = t, y = modelEst), color = "red") +
-    geom_ribbon(data = plotdata3, aes(x = t, ymin = CI1, ymax = CI2), fill = "blue", alpha = 0.2) +
-    xlab("Time") +
-    ylab("Power") +
-    ggtitle("Solar Power") +
-    theme(plot.title = element_text(hjust = 0.5), axis.text=element_text(size=12), axis.title=element_text(size=14,face="bold"))
-
-
-# Plot historical data, model and CI, without transformation
-plotdata1 <- data.frame(t = t, solar = X)
-plotdata2 <- data.frame(t = seq(2011, 2011+(k-1)/12, 1/12), modelEst = modelEst)
-plotdata3 <- data.frame(t = seq(2011, 2011+(k-1)/12, 1/12), CI1 = CI[,1], CI2 = CI[,2])
 ggplot() +
     geom_line(data = plotdata1, aes(x = t, y = solar), color = "black") +
     geom_line(data = plotdata2, aes(x = t, y = modelEst), color = "red") +
