@@ -53,7 +53,7 @@ plot(t, X, type = "l", xlab = "Time", ylab = "Power", main = "Solar Power")
 epsilon <- rnorm(N, mean = 0, sd = sigmaeps)
 
 # Define AR model and run on historical data
-xHat <- -phi1 * lagdf(X, 1) - Phi1 * lagdf(X, 12) - phi1 * Phi1 * lagdf(X, 13) + epsilon
+xHat <- -phi1 * lagdf(X, 1) - Phi1 * lagdf(X, 12) - phi1 * Phi1 * lagdf(X, 13) 
 
 
 # Plot 
@@ -93,7 +93,7 @@ epsilon <- rnorm(k, mean = 0, sd = sigmaeps)
 modelEst <- X
 
 for (i in 1:k) {
-    est <- -phi1 * modelEst[36+i-1] - Phi1 * modelEst[36+i-12] - phi1 * Phi1 * modelEst[36+i-13] + epsilon[i]
+    est <- -phi1 * modelEst[36+i-1] - Phi1 * modelEst[36+i-12] - phi1 * Phi1 * modelEst[36+i-13]
     modelEst <- c(modelEst, est)
 }
 # Plot log power
@@ -126,19 +126,18 @@ ggplot() +
 alpha <- 0.05
 z <- qnorm(1 - alpha/2)
 
- # CHECK THIS
 vars <- list()
 for (i in 1:k) {
     s <- 0
     for (j in 1:i) {
-        s <- s + phi1^(2*(j-1))
+        s <- s + phi1^(2*(i-j))
     }
     vars[i] <-  s
 }
 vars <- lapply(vars, "*", sigmaeps^2)
 vars <- unlist(vars)
 
-# Convert CI?
+# Compute CI
 CI <- cbind(modelEst - z * sqrt(vars), modelEst + z * sqrt(vars)) 
 
 # Plot historical data, model and CI
